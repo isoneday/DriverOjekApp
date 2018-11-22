@@ -8,8 +8,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.isoneday.driverojekapp.fcm.MyFirebaseInstanceIDService;
+import com.isoneday.driverojekapp.fcm.MyFirebaseMessagingService;
 import com.isoneday.driverojekapp.helper.SessionManager;
+import com.isoneday.driverojekapp.model.ResponseDetailDriver;
+import com.isoneday.driverojekapp.network.InitRetrofit;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class HalamanUtamaActivity extends AppCompatActivity {
 
@@ -20,6 +30,42 @@ public class HalamanUtamaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_halaman_utama);
         session = new SessionManager(this);
+        if (session.getGcm().isEmpty()){
+            String token =FirebaseInstanceId.getInstance().getToken();
+            session.setGcm(token);
+            inserttoken(token);
+        }
+        Intent a = new Intent(this,MyFirebaseMessagingService.class);
+        Intent c = new Intent(this,MyFirebaseInstanceIDService.class);
+        startService(a);
+        startService(c);
+    }
+
+    private void inserttoken(String token) {
+        int iduser = Integer.parseInt(session.getIdUser());
+        InitRetrofit.getInstance().insertToken(iduser,token).enqueue(
+                new Callback<ResponseDetailDriver>() {
+                    @Override
+                    public void onResponse(Call<ResponseDetailDriver> call, Response<ResponseDetailDriver> response) {
+                        if (response.isSuccessful()){
+                            String msg =response.body().getMsg();
+                            String result =response.body().getResult();
+                            if (result.equals("true")){
+                                Toast.makeText(HalamanUtamaActivity.this, msg, Toast.LENGTH_SHORT).show();
+                            }else{
+                                Toast.makeText(HalamanUtamaActivity.this, msg, Toast.LENGTH_SHORT).show();
+
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseDetailDriver> call, Throwable t) {
+
+                    }
+                }
+        );
+
     }
 
     public void onHistory(View view) {

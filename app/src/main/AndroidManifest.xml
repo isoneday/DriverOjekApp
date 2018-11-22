@@ -51,9 +51,22 @@
         <activity android:name=".WaitingDriverActivity" />
         <activity
             android:name=".DetailLokasiDriverActivity"
-            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"
-            android:label="@string/title_activity_detail_lokasi_driver" />
-        <activity android:name=".HistoryBookingActivity"></activity>
+            android:label="@string/title_activity_detail_lokasi_driver"
+            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar" />
+        <activity android:name=".HistoryBookingActivity" />
+
+        <service android:name=".fcm.MyFirebaseInstanceIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+            </intent-filter>
+        </service>
+        <service android:name=".fcm.MyFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <activity android:name=".DetailRequestActivity"></activity>
     </application>
 
 </manifest>

@@ -26,6 +26,7 @@ public class HistoryBookingActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         //buat tab
+        tablayout.addTab(tablayout.newTab().setText("Request"));
         tablayout.addTab(tablayout.newTab().setText("Proses"));
         tablayout.addTab(tablayout.newTab().setText("Selesai"));
         //untuk mengisi view dengan data pkai adapter
@@ -58,15 +59,18 @@ public class HistoryBookingActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return 2;
+            return 3;
         }
 
         @Override
         public Fragment getItem(int i) {
         if (i==0){
-            return new ProsesFragment(2);
+            return new HistoryFragment(1);
+        }else if (i==1){
+            return new HistoryFragment(2);
+
         }else {
-            return new ProsesFragment(4);
+            return new HistoryFragment(4);
 
         }
         }

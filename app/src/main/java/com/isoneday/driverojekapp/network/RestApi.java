@@ -4,6 +4,7 @@ package com.isoneday.driverojekapp.network;
 import com.isoneday.driverojekapp.model.ResponseCheckBooking;
 import com.isoneday.driverojekapp.model.ResponseDetailDriver;
 import com.isoneday.driverojekapp.model.ResponseHistory;
+import com.isoneday.driverojekapp.model.ResponseHistoryRequest;
 import com.isoneday.driverojekapp.model.ResponseInsertBooking;
 import com.isoneday.driverojekapp.model.ResponseLoginRegis;
 import com.isoneday.driverojekapp.model.ResponseWaypoint;
@@ -91,4 +92,29 @@ public interface RestApi {
     @POST("get_driver")
     Call<ResponseDetailDriver> getdetaildriver(
             @Field("f_iddriver") int iddriver);
+ //endpoint untuk insert_token
+    @FormUrlEncoded
+    @POST("registerGcm")
+    Call<ResponseDetailDriver> insertToken(
+            @Field("f_idUser") int iduser,
+            @Field("f_gcm") String fcm);
+
+    @FormUrlEncoded
+    @POST("get_handle_booking")
+    Call<ResponseHistoryRequest> getHandleHistory(
+            @Field("f_device") String device,
+            @Field("f_token") String token,
+            @Field("f_idUser") String iddriver);
+
+    @FormUrlEncoded
+    @POST("get_complete_booking")
+    Call<ResponseHistoryRequest> getCompleteHistory(
+            @Field("f_device") String device,
+            @Field("f_token") String token,
+            @Field("f_idUser") String iddriver);
+
+    @GET("get_request_booking")
+    Call<ResponseHistoryRequest> getRequestHistory();
+
+
 }
