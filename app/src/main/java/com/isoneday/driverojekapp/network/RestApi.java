@@ -113,6 +113,23 @@ public interface RestApi {
             @Field("f_token") String token,
             @Field("f_idUser") String iddriver);
 
+    @FormUrlEncoded
+    @POST("take_booking")
+    Call<ResponseHistoryRequest> take_booking(
+            @Field("id") String idbooking,
+            @Field("f_iddriver") String iddriver,
+            @Field("f_device") String device,
+            @Field("f_token") String token);
+
+    @FormUrlEncoded
+    @POST("insert_posisi")
+    Call<ResponseHistoryRequest> sendposition(
+            @Field("f_lat") String lat,
+            @Field("f_lng") String longitude,
+            @Field("f_idUser") String iddriver,
+            @Field("f_device") String device,
+            @Field("f_token") String token);
+
     @GET("get_request_booking")
     Call<ResponseHistoryRequest> getRequestHistory();
 

@@ -67,6 +67,8 @@
         </service>
 
         <activity android:name=".DetailRequestActivity"></activity>
+        <service android:name=".helper.PositionHelper"></service>
+        <service android:name=".helper.LocationMonitoringService"></service>
     </application>
 
 </manifest>

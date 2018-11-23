@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -15,13 +16,14 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.isoneday.driverojekapp.helper.DirectionMapsV2;
+import com.isoneday.driverojekapp.helper.HeroHelper;
 import com.isoneday.driverojekapp.helper.MyContants;
 import com.isoneday.driverojekapp.helper.SessionManager;
-import com.isoneday.driverojekapp.model.DataHistory;
 import com.isoneday.driverojekapp.model.DataRequestHistory;
 import com.isoneday.driverojekapp.model.Distance;
 import com.isoneday.driverojekapp.model.Duration;
 import com.isoneday.driverojekapp.model.LegsItem;
+import com.isoneday.driverojekapp.model.ResponseHistoryRequest;
 import com.isoneday.driverojekapp.model.ResponseWaypoint;
 import com.isoneday.driverojekapp.model.RoutesItem;
 import com.isoneday.driverojekapp.network.InitRetrofit;
@@ -78,39 +80,66 @@ public class DetailRequestActivity extends AppCompatActivity implements OnMapRea
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.mapDetail);
         mapFragment.getMapAsync(this);
-        data = getIntent().getIntExtra(MyContants.INDEX,0);
+        data = getIntent().getIntExtra(MyContants.INDEX, 0);
         detaildata = HistoryFragment.datahistory.get(data);
         session = new SessionManager(this);
         detailrequest();
     }
 
     private void detailrequest() {
-        requestFrom.setText("dari :"+detaildata.getBookingFrom());
-        requestTo.setText("tujuan :"+detaildata.getBookingTujuan());
-        requestTarif.setText("tarif :"+detaildata.getBookingBiayaUser());
-        requestWaktu.setText("jarak :"+detaildata.getBookingJarak());
-        requestNama.setText("nama :"+detaildata.getUserNama());
-        requestEmail.setText("email :"+detaildata.getUserEmail());
+        requestFrom.setText("dari :" + detaildata.getBookingFrom());
+        requestTo.setText("tujuan :" + detaildata.getBookingTujuan());
+        requestTarif.setText("tarif :" + detaildata.getBookingBiayaUser());
+        requestWaktu.setText("jarak :" + detaildata.getBookingJarak());
+        requestNama.setText("nama :" + detaildata.getUserNama());
+        requestEmail.setText("email :" + detaildata.getUserEmail());
 
     }
 
     @OnClick(R.id.requestTakeBooking)
     public void onViewClicked() {
+        String idbooking = detaildata.getIdBooking();
+        String token = session.getToken();
+        String device = HeroHelper.getDeviceUUID(this);
+        String iddriver = session.getIdUser();
+
+        InitRetrofit.getInstance().take_booking(idbooking, iddriver, device, token).enqueue(new Callback<ResponseHistoryRequest>() {
+            @Override
+            public void onResponse(Call<ResponseHistoryRequest> call, Response<ResponseHistoryRequest> response) {
+                if (response.isSuccessful()) {
+                    String result = response.body().getResult();
+                    String msg = response.body().getMsg();
+                    if (result.equals("true")) {
+                        startActivity(new Intent(DetailRequestActivity.this, HistoryBookingActivity.class));
+                        Toast.makeText(DetailRequestActivity.this, msg, Toast.LENGTH_SHORT).show();
+
+                    } else {
+                        Toast.makeText(DetailRequestActivity.this, msg, Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseHistoryRequest> call, Throwable t) {
+                Toast.makeText(DetailRequestActivity.this, "cek koneksi anda"+t.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-    mmap = googleMap;
-    actionrute();
-    mmap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-        @Override
-        public void onMapClick(LatLng latLng) {
-            Intent i = new Intent(Intent.ACTION_VIEW,
-                    Uri.parse("http://maps.google.com/maps?daddr="
-             +detaildata.getBookingTujuanLat()+","+detaildata.getBookingTujuanLng()));
-            startActivity(i);
-        }
-    });
+        mmap = googleMap;
+        actionrute();
+        mmap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                Intent i = new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("http://maps.google.com/maps?daddr="
+                                + detaildata.getBookingTujuanLat() + "," + detaildata.getBookingTujuanLng()));
+                startActivity(i);
+            }
+        });
     }
 
     private void actionrute() {
